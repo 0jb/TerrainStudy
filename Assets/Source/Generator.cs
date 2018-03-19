@@ -72,18 +72,27 @@ public class Generator : MonoBehaviour
                 currentCell = Instantiate(GetVoxel( source.GetPixel(x,y) ) );
                 currentCell.transform.position = new Vector3(x, height, y);
                 currentCell.transform.parent = transform;
-                _buffer.Add(currentCell);
             }
         }
     }
     
     private void DestroyAll()
     {
+        FeedBuffer();
         for (int i = 0; i < _buffer.Count; i++)
         {
             DestroyImmediate(_buffer[i]);
         }
         _buffer.Clear();
+    }
+
+    private void FeedBuffer()
+    {
+        _buffer.Clear();
+        for (int i = 0; i < transform.childCount; i++)
+        {
+            _buffer.Add(transform.GetChild(i).gameObject);
+        }
     }
 
     private void Update()
