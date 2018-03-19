@@ -2,5 +2,5 @@
 
 TODO:
 
-Make alorigthm catch geometry, discard materials.
-Create seams, geometry between weldable vertices.
+* Make alorigthm catch geometry, discard materials.
+* Create seams, geometry between weldable vertices.
