@@ -2,112 +2,62 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[ExecuteInEditMode]
-public class Generator : MonoBehaviour
+namespace TerrainEngine
 {
-    [SerializeField]
-    private List<Texture2D> _layers = new List<Texture2D>();
-
-    [SerializeField]
-    private List<ColorMappedVoxel> _voxel = new List<ColorMappedVoxel>();
-
-    private List<GameObject> _buffer = new List<GameObject>();
-
-    public bool DebugNow;
-    public bool Clear;
-
-    [System.Serializable]
-    public class ColorMappedVoxel
+    [ExecuteInEditMode]
+    [RequireComponent(typeof(VoxelData))]
+    public class Generator : MonoBehaviour
     {
-        public Color ColorMap;
-        public GameObject Target;
+        public bool DebugNow;
+        public bool Clear;
 
-        public ColorMappedVoxel(Color _ColorMap, GameObject _Target)
+        private VoxelData voxelDataRef;
+
+        private void OnEnable()
         {
-            ColorMap = _ColorMap;
-            Target = _Target;
+            voxelDataRef = GetComponent<VoxelData>();
         }
 
-        public GameObject GetVoxelByColor(Color Selector)
+        private void BuildAll()
         {
-            if(ColorMap == Selector)
+            for (int i = 0; i < voxelDataRef.layers.Count; i++)
             {
-                return Target;
-            }
-
-            return null;
-        }
-    }
-
-    private GameObject GetVoxel(Color Selector)
-    {
-        for (int i = 0; i < _voxel.Count; i++)
-        {
-            if (_voxel[i].GetVoxelByColor(Selector))
-            {
-                return _voxel[i].Target;
+                BuildLayer(voxelDataRef.layers[i], i);
             }
         }
-        return null;
-    }
 
-    private void BuildAll()
-    {
-        for (int i = 0; i < _layers.Count; i ++)
+        private void BuildLayer(Texture2D source, float height)
         {
-            BuildLayer(_layers[i], i);
-        }
-    }
+            int gridX = source.width;
+            int gridY = source.height;
 
-    private void BuildLayer (Texture2D source, float height)
-    {
-        int gridX = source.width;
-        int gridY = source.height;
-
-        for (int x = 0; x <= gridX; x++)
-        {
-            for(int y = 0; y <= gridY; y++)
+            for (int x = 0; x <= gridX; x++)
             {
-                GameObject currentCell;
-                currentCell = Instantiate(GetVoxel( source.GetPixel(x,y) ) );
-                currentCell.transform.position = new Vector3(x, height, y);
-                currentCell.transform.parent = transform;
+                for (int y = 0; y <= gridY; y++)
+                {
+                    GameObject currentCell;
+                    currentCell = Instantiate(voxelDataRef.GetVoxel(source.GetPixel(x, y)));
+                    currentCell.transform.position = new Vector3(x, height, y);
+                    currentCell.transform.parent = transform;
+                }
             }
-        }
-    }
-    
-    private void DestroyAll()
-    {
-        FeedBuffer();
-        for (int i = 0; i < _buffer.Count; i++)
-        {
-            DestroyImmediate(_buffer[i]);
-        }
-        _buffer.Clear();
-    }
+        }           
 
-    private void FeedBuffer()
-    {
-        _buffer.Clear();
-        for (int i = 0; i < transform.childCount; i++)
+        private void Update()
         {
-            _buffer.Add(transform.GetChild(i).gameObject);
-        }
-    }
+            if (Clear)
+            {
+                voxelDataRef.DestroyAll();
+                Clear = false;
+            }
 
-    private void Update()
-    {
-        if (Clear)
-        {
-            DestroyAll();
-            Clear = false;
-        }
-
-        if (DebugNow)
-        {
-            DestroyAll();
-            BuildAll();
-            DebugNow = false;
+            if (DebugNow)
+            {
+                voxelDataRef.DestroyAll();
+                BuildAll();
+                DebugNow = false;
+            }
         }
     }
 }
+
