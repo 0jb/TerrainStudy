@@ -1,4 +1,5 @@
 # TerrainStudy
+![diagram](https://i.imgur.com/ZzjugR4.png)
 
 TODO:
 
