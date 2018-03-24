@@ -33,9 +33,7 @@ namespace TerrainEngine
             {
                 if (ColorMap == Selector)
                 {
-
                     return Target;
-                    
                 }
 
                 return null;
@@ -72,9 +70,6 @@ namespace TerrainEngine
             }
             return null;
         }
-
-        public GameObject showNeighbors;
-        
     }
 }
 
