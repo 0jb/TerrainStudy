@@ -6,6 +6,7 @@ namespace TerrainEngine
 {
     [ExecuteInEditMode]
     [RequireComponent(typeof(VoxelData))]
+    [RequireComponent(typeof(MeshFilter))]
     public class Generator : MonoBehaviour
     {
         public bool DebugNow;
@@ -26,6 +27,19 @@ namespace TerrainEngine
             }
         }
 
+        private void CombineAll(MeshFilter[] Origin)
+        {
+            CombineInstance[] combine = new CombineInstance[Origin.Length];
+            for(int i = 0; i < Origin.Length; i++)
+            {
+                combine[i].mesh = Origin[i].sharedMesh;
+                combine[i].transform = Origin[i].transform.localToWorldMatrix;
+                Origin[i].gameObject.SetActive(false);
+            }
+            transform.GetComponent<MeshFilter>().sharedMesh = new Mesh();
+            transform.GetComponent<MeshFilter>().sharedMesh.CombineMeshes(combine);
+        }
+
         private void BuildLayer(Texture2D source, float height)
         {
             int gridX = source.width;
@@ -41,12 +55,20 @@ namespace TerrainEngine
                     currentCell.transform.parent = transform;
                 }
             }
-        }           
+            CombineAll(GetComponentsInChildren<MeshFilter>());
+            voxelDataRef.DestroyAll();
+        }
+        
+        private void ClearGeneratedMesh()
+        {
+            transform.GetComponent<MeshFilter>().sharedMesh = new Mesh();
+        }
 
         private void Update()
         {
             if (Clear)
             {
+                ClearGeneratedMesh();
                 voxelDataRef.DestroyAll();
                 Clear = false;
             }
@@ -60,4 +82,3 @@ namespace TerrainEngine
         }
     }
 }
-
