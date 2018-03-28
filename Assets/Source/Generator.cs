@@ -17,15 +17,17 @@ namespace TerrainEngine
         private void OnEnable()
         {
             voxelDataRef = GetComponent<VoxelData>();
+            Application.runInBackground = true;
         }
 
-        private void BuildAll()
+        private IEnumerator BuildAll()
         {
             for (int i = 0; i < voxelDataRef.layers.Count; i++)
             {
                 BuildLayer(voxelDataRef.layers[i], i);
+                yield return null;
             }
-            CombineAll(GetVoxelMeshFilters());
+            
             gameObject.SetActive(true);
             voxelDataRef.DestroyAll();
         }
@@ -35,13 +37,12 @@ namespace TerrainEngine
             CombineInstance[] combine = new CombineInstance[Origin.Count];
             for(int i = 0; i < Origin.Count; i++)
             {
-                Debug.Log(i);
                 combine[i].mesh = Origin[i].Mesh.sharedMesh;
                 combine[i].transform = Origin[i].Mesh.transform.localToWorldMatrix;
                 Origin[i].Mesh.gameObject.SetActive(false);
             }
             transform.GetComponent<MeshFilter>().sharedMesh = new Mesh();
-            transform.GetComponent<MeshFilter>().sharedMesh.CombineMeshes(combine);            
+            transform.GetComponent<MeshFilter>().sharedMesh.CombineMeshes(combine);
         }
 
         private List<Voxel.MeshPerAngle> GetVoxelMeshFilters()
@@ -71,9 +72,8 @@ namespace TerrainEngine
                     currentCell.transform.parent = transform;
                 }
             }
+            CombineAll(GetVoxelMeshFilters());
 
-            //CombineAll(GetComponentsInChildren<MeshFilter>());
-            
         }
         
         private void ClearGeneratedMesh()
@@ -93,7 +93,7 @@ namespace TerrainEngine
             if (DebugNow)
             {
                 voxelDataRef.DestroyAll();
-                BuildAll();
+                StartCoroutine(BuildAll());
                 DebugNow = false;
             }
         }
