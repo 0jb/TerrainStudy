@@ -21,15 +21,15 @@ namespace TerrainEngine
         public class ColorMappedVoxel
         {
             public Color ColorMap;
-            public GameObject Target;
+            public Voxel Target;
 
-            public ColorMappedVoxel(Color _ColorMap, GameObject _Target)
+            public ColorMappedVoxel(Color _ColorMap, Voxel _Target)
             {
                 ColorMap = _ColorMap;
                 Target = _Target;
             }
 
-            public GameObject GetVoxelByColor(Color Selector)
+            public Voxel GetVoxelByColor(Color Selector)
             {
                 if (ColorMap == Selector)
                 {
@@ -61,7 +61,7 @@ namespace TerrainEngine
             }
         }
 
-        public GameObject GetVoxel(Color Selector)
+        public Voxel GetVoxel(Color Selector)
         {
             for (int i = 0; i < _voxel.Count; i++)
             {
@@ -72,8 +72,6 @@ namespace TerrainEngine
             }
             return null;
         }
-
-        public GameObject showNeighbors;
         
     }
 }
