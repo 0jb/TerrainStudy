@@ -9,8 +9,6 @@ namespace TerrainEngine
     [RequireComponent(typeof(MeshFilter))]
     public class Generator : MonoBehaviour
     {
-        public bool DebugNow;
-        public bool Clear;
 
         private VoxelData voxelDataRef;
 
@@ -81,21 +79,49 @@ namespace TerrainEngine
             transform.GetComponent<MeshFilter>().sharedMesh = new Mesh();
         }
 
-        private void Update()
+        private void Start()
         {
-            if (Clear)
-            {
-                ClearGeneratedMesh();
-                voxelDataRef.DestroyAll();
-                Clear = false;
-            }
+            StartCoroutine(BuildAll());     
+        }
 
-            if (DebugNow)
+        #if UNITY_EDITOR
+        public float DebugGenerateDelay = 0f;
+        [ContextMenu("Generate")]
+        private void ContextGenerate()
+        {
+            ClearGeneratedMesh();
+            voxelDataRef.DestroyAll();
+            i = 0; t = UnityEditor.EditorApplication.timeSinceStartup;
+            UnityEditor.EditorApplication.update += EditorUpdate;
+        }
+
+        [ContextMenu("Clear")]
+        private void ContextClear()
+        {
+            ClearGeneratedMesh();
+            voxelDataRef.DestroyAll();
+        }
+
+        int i;
+        double t;
+        private void EditorUpdate()
+        {
+            if(i < voxelDataRef.layers.Count)
             {
+                if(UnityEditor.EditorApplication.timeSinceStartup - t >= DebugGenerateDelay)
+                {
+                    t += DebugGenerateDelay;
+                    BuildLayer(voxelDataRef.layers[i], i);
+                    i++;
+                }
+            }
+            else
+            {
+                gameObject.SetActive(true);
                 voxelDataRef.DestroyAll();
-                StartCoroutine(BuildAll());
-                DebugNow = false;
+                UnityEditor.EditorApplication.update -= EditorUpdate;
             }
         }
+        #endif
     }
 }
