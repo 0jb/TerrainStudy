@@ -17,7 +17,6 @@ namespace TerrainEngine
         private void OnEnable()
         {
             voxelDataRef = GetComponent<VoxelData>();
-            Application.runInBackground = true;
         }
 
         private IEnumerator BuildAll()
@@ -29,20 +28,17 @@ namespace TerrainEngine
             }
             
             gameObject.SetActive(true);
+            voxelDataRef.DestroyAll();
+            UpdateMeshCollider();
         }
 
         private void CombineAll(List<Voxel.MeshPerAngle> Origin)
         {
-            CombineInstance[] combine = new CombineInstance[Origin.Count + 1];
-            for(int i = 0; i < Origin.Count; i++)
+            CombineInstance[] combine = new CombineInstance[Origin.Count];
+            combine[0].mesh = GetComponent<MeshFilter>().sharedMesh;
+            combine[0].transform = transform.localToWorldMatrix;
+            for (int i = 0; i  < Origin.Count; i++)
             {
-                if(i == 0)
-                {
-                    combine[0].mesh = GetComponent<MeshFilter>().sharedMesh;
-                    combine[0].transform = transform.localToWorldMatrix;
-                    continue;
-                }
-
                 combine[i].mesh = Origin[i].Mesh.sharedMesh;
                 combine[i].transform = Origin[i].Mesh.transform.localToWorldMatrix;
                 Origin[i].Mesh.gameObject.SetActive(false);
@@ -68,24 +64,34 @@ namespace TerrainEngine
             int gridX = source.width;
             int gridY = source.height;
 
-            for (int x = 0; x <= gridX; x++)
+            for (int x = 0; x < gridX; x++)
             {
-                for (int y = 0; y <= gridY; y++)
+                for (int y = 0; y < gridY; y++)
                 {
-                    Voxel currentCell;
-                    currentCell = Instantiate(voxelDataRef.GetVoxel(source.GetPixel(x, y)));
-                    currentCell.transform.position = new Vector3(x, height, y);
-                    currentCell.transform.parent = transform;
+                    Voxel currentCell = voxelDataRef.GetVoxel(source.GetPixel(x, y));
+                    if(currentCell != null)
+                    {
+                        currentCell = Instantiate(currentCell);
+                        currentCell.transform.position = new Vector3(x, height, y);
+                        currentCell.transform.parent = transform;
+                    }                    
                 }
             }
             CombineAll(GetVoxelMeshFilters());
-            voxelDataRef.DestroyAll();
-
+            
         }
         
         private void ClearGeneratedMesh()
         {
             transform.GetComponent<MeshFilter>().sharedMesh = new Mesh();
+        }
+
+        private void UpdateMeshCollider()
+        {
+            if(GetComponent<MeshCollider>() != null)
+            {
+                GetComponent<MeshCollider>().sharedMesh = GetComponent<MeshFilter>().sharedMesh;
+            }
         }
 
         private void Update()
