@@ -29,14 +29,20 @@ namespace TerrainEngine
             }
             
             gameObject.SetActive(true);
-            voxelDataRef.DestroyAll();
         }
 
         private void CombineAll(List<Voxel.MeshPerAngle> Origin)
         {
-            CombineInstance[] combine = new CombineInstance[Origin.Count];
+            CombineInstance[] combine = new CombineInstance[Origin.Count + 1];
             for(int i = 0; i < Origin.Count; i++)
             {
+                if(i == 0)
+                {
+                    combine[0].mesh = GetComponent<MeshFilter>().sharedMesh;
+                    combine[0].transform = transform.localToWorldMatrix;
+                    continue;
+                }
+
                 combine[i].mesh = Origin[i].Mesh.sharedMesh;
                 combine[i].transform = Origin[i].Mesh.transform.localToWorldMatrix;
                 Origin[i].Mesh.gameObject.SetActive(false);
@@ -73,6 +79,7 @@ namespace TerrainEngine
                 }
             }
             CombineAll(GetVoxelMeshFilters());
+            voxelDataRef.DestroyAll();
 
         }
         
