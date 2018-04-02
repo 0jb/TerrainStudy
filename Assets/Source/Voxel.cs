@@ -27,9 +27,9 @@ public class Voxel : MonoBehaviour
     
     [SerializeField]
     private List<Quaternion> _QuaternionIntRef;
-
     [SerializeField]
     private VoxelType _type;
+    public VoxelType type { get { return _type; } }
     [SerializeField]
     public List<MeshPerAngle> _meshPerAngle;
 

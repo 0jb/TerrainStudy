@@ -74,9 +74,13 @@ namespace TerrainEngine
                             Debug.Log("neighbor y " + (YAdress - 1));
                             NeighborColor = HomeBlock.GetPixel(XAdress, YAdress - 1);
                             Neighbor = VoxelDataRef.GetVoxel(NeighborColor);
-                            if (!Neighbor.DoIContainThisAngle(4))
+
+                            // TODO:
+                            // COUSIN: TYPES THAT HAVE RELATIONSHIP AND CAN SHARE SEAMS
+                            // COUSINS SHOULD BE DETECTED HERE AND INSTANTIATE A SEAM
+                            if (Neighbor.type == Home.type)
                             {
-                                //KeepMyWalls.Remove(Home._meshPerAngle[i]);
+                                KeepMyWalls.Remove(Home._meshPerAngle[3]);
                             }
                         }                        
                         break;
