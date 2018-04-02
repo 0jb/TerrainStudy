@@ -7,16 +7,19 @@ namespace TerrainEngine
     [ExecuteInEditMode]
     [RequireComponent(typeof(VoxelData))]
     [RequireComponent(typeof(MeshFilter))]
+    [RequireComponent(typeof(Neighborhood))]
     public class Generator : MonoBehaviour
     {
         public bool DebugNow;
         public bool Clear;
 
         private VoxelData voxelDataRef;
+        private Neighborhood neighborhoodRef;
 
         private void OnEnable()
         {
             voxelDataRef = GetComponent<VoxelData>();
+            neighborhoodRef = GetComponent<Neighborhood>();
         }
 
         private IEnumerator BuildAll()
@@ -69,9 +72,10 @@ namespace TerrainEngine
                 for (int y = 0; y < gridY; y++)
                 {
                     Voxel currentCell = voxelDataRef.GetVoxel(source.GetPixel(x, y));
-                    if(currentCell != null)
+                    if (currentCell != null)
                     {
                         currentCell = Instantiate(currentCell);
+                        currentCell._meshPerAngle = neighborhoodRef.WallsToBeKept(source, null, null, currentCell, x, y);
                         currentCell.transform.position = new Vector3(x, height, y);
                         currentCell.transform.parent = transform;
                     }                    

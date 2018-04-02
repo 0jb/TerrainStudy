@@ -8,6 +8,7 @@ What it currently does:
 
 TODO:
 
+* Convert faces using Quaternions to Vector3 on the same space as texture so we can use this info to determine neighbor pixels
 * Delete or do not instantiate angles that will get on top of neighboor meshes.
 * We must be able to create seams between different types, so when Generator finds a type that has a valid seam already assigned, it uses it to fill the gap between multiple voxel types.
 * Create seams, geometry between weldable vertices.
