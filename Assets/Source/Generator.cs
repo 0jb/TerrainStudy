@@ -15,7 +15,6 @@ namespace TerrainEngine
         private void OnEnable()
         {
             voxelDataRef = GetComponent<VoxelData>();
-            Application.runInBackground = true;
         }
 
         private IEnumerator BuildAll()
@@ -28,12 +27,15 @@ namespace TerrainEngine
             
             gameObject.SetActive(true);
             voxelDataRef.DestroyAll();
+            UpdateMeshCollider();
         }
 
         private void CombineAll(List<Voxel.MeshPerAngle> Origin)
         {
             CombineInstance[] combine = new CombineInstance[Origin.Count];
-            for(int i = 0; i < Origin.Count; i++)
+            combine[0].mesh = GetComponent<MeshFilter>().sharedMesh;
+            combine[0].transform = transform.localToWorldMatrix;
+            for (int i = 0; i  < Origin.Count; i++)
             {
                 combine[i].mesh = Origin[i].Mesh.sharedMesh;
                 combine[i].transform = Origin[i].Mesh.transform.localToWorldMatrix;
@@ -60,23 +62,35 @@ namespace TerrainEngine
             int gridX = source.width;
             int gridY = source.height;
 
-            for (int x = 0; x <= gridX; x++)
+            for (int x = 0; x < gridX; x++)
             {
-                for (int y = 0; y <= gridY; y++)
+                for (int y = 0; y < gridY; y++)
                 {
-                    Voxel currentCell;
-                    currentCell = Instantiate(voxelDataRef.GetVoxel(source.GetPixel(x, y)));
-                    currentCell.transform.position = new Vector3(x, height, y);
-                    currentCell.transform.parent = transform;
+                    Voxel currentCell = voxelDataRef.GetVoxel(source.GetPixel(x, y));
+                    if(currentCell != null)
+                    {
+                        currentCell = Instantiate(currentCell);
+                        currentCell.transform.position = new Vector3(x, height, y);
+                        currentCell.transform.parent = transform;
+                    }                    
                 }
             }
             CombineAll(GetVoxelMeshFilters());
-
+            
         }
         
         private void ClearGeneratedMesh()
         {
             transform.GetComponent<MeshFilter>().sharedMesh = new Mesh();
+        }
+
+
+        private void UpdateMeshCollider()
+        {
+            if(GetComponent<MeshCollider>() != null)
+            {
+                GetComponent<MeshCollider>().sharedMesh = GetComponent<MeshFilter>().sharedMesh;
+            }
         }
 
         private void Start()

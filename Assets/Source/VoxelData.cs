@@ -33,9 +33,7 @@ namespace TerrainEngine
             {
                 if (ColorMap == Selector)
                 {
-
-                    return Target;
-                    
+                    return Target;                    
                 }
 
                 return null;
