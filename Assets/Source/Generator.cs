@@ -75,6 +75,7 @@ namespace TerrainEngine
                     if (currentCell != null)
                     {
                         currentCell = Instantiate(currentCell);
+                        currentCell.gameObject.name = "x"+ x.ToString()+ "y" + y.ToString();
                         currentCell._meshPerAngle = neighborhoodRef.WallsToBeKept(source, null, null, currentCell, x, y);
                         currentCell.transform.position = new Vector3(x, height, y);
                         currentCell.transform.parent = transform;

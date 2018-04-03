@@ -9,16 +9,12 @@ namespace TerrainEngine
     public class Neighborhood : MonoBehaviour
     {
         private VoxelData VoxelDataRef;
-        //public Color NeighborColor = new Color(0.0f, 0.0f, 0.0f, 1.0f);
-        //private Voxel Neighbor;
-
 
         private void OnEnable()
         {
             VoxelDataRef = GetComponent<VoxelData>();
         }
-
-        //public void WallsToBeKept(
+        
         public List<Voxel.MeshPerAngle> WallsToBeKept(
             Texture2D HomeBlock,
             Texture2D Downstairs,
@@ -28,12 +24,11 @@ namespace TerrainEngine
             int YAdress
             )
         {
-            List<Voxel.MeshPerAngle> KeepMyWalls = Home._meshPerAngle ;            
-            //List<Voxel.MeshPerAngle> KeepMyWalls = new List<Voxel.MeshPerAngle>();
-
+            List<Voxel.MeshPerAngle> KeepMyWalls = Home._meshPerAngle ;
 
             for (int i = 0; i < Home._meshPerAngle.Count; i++)
             {
+                Debug.Log(i);
                 switch (Home._meshPerAngle[i].PivotAngle)
                 {
                     default:
@@ -61,18 +56,15 @@ namespace TerrainEngine
                             Neighbor = VoxelDataRef.GetVoxel(NeighborColor);
                             if (!Neighbor.DoIContainThisAngle(0))
                             {
-                                //KeepMyWalls.Remove(Home._meshPerAngle[i]);
+                                //KeepMyWalls.Remove(Home._meshPerAngle[1]); 
+                                KeepMyWalls[i].CandidateForExclusion = true;
                             }
                         }                        
                         break;
                     case 2:
-                        if (YAdress - 1 > 0)
+                        if (XAdress - 1 > 0)
                         {
-                            Debug.Log("Face 2");
-                            Debug.Log("source x "+XAdress);
-                            Debug.Log("source y "+YAdress);
-                            Debug.Log("neighbor y " + (YAdress - 1));
-                            NeighborColor = HomeBlock.GetPixel(XAdress, YAdress - 1);
+                            NeighborColor = HomeBlock.GetPixel(XAdress -1, YAdress);
                             Neighbor = VoxelDataRef.GetVoxel(NeighborColor);
 
                             // TODO:
@@ -80,18 +72,27 @@ namespace TerrainEngine
                             // COUSINS SHOULD BE DETECTED HERE AND INSTANTIATE A SEAM
                             if (Neighbor.type == Home.type)
                             {
-                                KeepMyWalls.Remove(Home._meshPerAngle[3]);
+                                KeepMyWalls[i].CandidateForExclusion = true;
                             }
                         }                        
                         break;
                     case 3:
-                        if (HomeBlock.width >= XAdress + 1)
-                        {
-                            NeighborColor = HomeBlock.GetPixel(XAdress + 1, YAdress);
+                        if (YAdress - 1 > 0)
+                        {                            
+                            NeighborColor = HomeBlock.GetPixel(XAdress, YAdress - 1);
                             Neighbor = VoxelDataRef.GetVoxel(NeighborColor);
-                            if (!Neighbor.DoIContainThisAngle(5))
+                            
+                            if (Neighbor.type == Home.type)
                             {
-                                //KeepMyWalls.Remove(Home._meshPerAngle[i]);
+                                Debug.Log("Face 3");
+                                Debug.Log("source x" + XAdress + " y" + YAdress);
+                                Debug.Log("neighbor x" + XAdress + " y" + (YAdress - 1));
+
+                                KeepMyWalls[i].CandidateForExclusion = true;
+                            }
+                            else
+                            {
+                                Debug.Log("no neighbor");
                             }
                         }                        
                         break;
@@ -100,9 +101,10 @@ namespace TerrainEngine
                         {
                             NeighborColor = HomeBlock.GetPixel(XAdress, YAdress + 1);
                             Neighbor = VoxelDataRef.GetVoxel(NeighborColor);
-                            if (!Neighbor.DoIContainThisAngle(2))
+
+                            if (Neighbor.type == Home.type)
                             {
-                                //KeepMyWalls.Remove(Home._meshPerAngle[i]);
+                                //KeepMyWalls[i].CandidateForExclusion = true;
                             }
                         }                        
                         break;
@@ -113,10 +115,19 @@ namespace TerrainEngine
                             Neighbor = VoxelDataRef.GetVoxel(NeighborColor);
                             if (!Neighbor.DoIContainThisAngle(3))
                             {
-                                //KeepMyWalls.Remove(Home._meshPerAngle[i]);
                             }
                         }                        
                         break;
+                }
+            }
+
+            int listLength = KeepMyWalls.Count;
+
+            for (int i = 0; i < listLength; i++)
+            {
+                if (KeepMyWalls[i].CandidateForExclusion)
+                {
+                    KeepMyWalls.RemoveAt(i);
                 }
             }
 

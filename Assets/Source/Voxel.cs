@@ -23,6 +23,7 @@ public class Voxel : MonoBehaviour
             PivotAngle = _PivotAngle;
             Mesh = _Mesh;
         }
+        
     }
     
     [SerializeField]
@@ -74,7 +75,7 @@ public class Voxel : MonoBehaviour
 
         return false;
     }
-
+        
     private void Update()
     {
         if (PopulateNow)
