@@ -1,6 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace TerrainEngine
 {
@@ -20,7 +23,10 @@ namespace TerrainEngine
         {
             voxelDataRef = GetComponent<VoxelData>();
             neighborhoodRef = GetComponent<Neighborhood>();
-            StartCoroutine(BuildAll());
+            if (Application.isPlaying)
+            {
+                StartCoroutine(BuildAll());
+            }
         }
 
         private IEnumerator BuildAll()
