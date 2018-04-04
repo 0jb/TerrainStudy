@@ -148,37 +148,29 @@ namespace TerrainEngine
                 if(UnityEditor.EditorApplication.timeSinceStartup - t >= DebugGenerateDelay)
                 {
                     t += DebugGenerateDelay;
-
-                    for (int i = 0; i < voxelDataRef.layers.Count; i++)
+                    //BuildLayer(voxelDataRef.layers[v], v);
+                    if (voxelDataRef.layers.Count > 1)
                     {
-                        if (voxelDataRef.layers.Count > 1)
+                        if (v == 0)
                         {
-                            if (i == 0)
-                            {
-                                BuildLayer(voxelDataRef.layers[0], 0, null, voxelDataRef.layers[1]);
-                                v++;
-                            }
-                            else if (i + 1 < voxelDataRef.layers.Count)
-                            {
-                                BuildLayer(voxelDataRef.layers[i], i, voxelDataRef.layers[i - 1], voxelDataRef.layers[i + 1]);
-                                v++;
-                            }
-                            else if (i == voxelDataRef.layers.Count - 1)
-                            {
-                                BuildLayer(voxelDataRef.layers[i], i, voxelDataRef.layers[i - 1], null);
-                                v++;
-                            }
+                            BuildLayer(voxelDataRef.layers[0], 0, null, voxelDataRef.layers[1]);
+                        }
+                        else if (v + 1 < voxelDataRef.layers.Count)
+                        {
+                            BuildLayer(voxelDataRef.layers[v], v, voxelDataRef.layers[v - 1], voxelDataRef.layers[v + 1]);
+                        }
+                        else if (v == voxelDataRef.layers.Count - 1)
+                        {
+                            BuildLayer(voxelDataRef.layers[v], v, voxelDataRef.layers[v - 1], null);
+                        }
 
 
-                        }
-                        else if (voxelDataRef.layers.Count == 1)
-                        {
-                            BuildLayer(voxelDataRef.layers[i], i);
-                            v++;
-                        }
-                        i++;
-                        
                     }
+                    else if (voxelDataRef.layers.Count == 1)
+                    {
+                        BuildLayer(voxelDataRef.layers[v], v);
+                    }
+                    v++;
                     
                 }
             }
