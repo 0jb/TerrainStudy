@@ -13,11 +13,14 @@ namespace TerrainEngine
 
         private VoxelData voxelDataRef;
         private Neighborhood neighborhoodRef;
+        private int v;
+        private double t;
 
         private void OnEnable()
         {
             voxelDataRef = GetComponent<VoxelData>();
             neighborhoodRef = GetComponent<Neighborhood>();
+            StartCoroutine(BuildAll());
         }
 
         private IEnumerator BuildAll()
@@ -119,11 +122,6 @@ namespace TerrainEngine
             }
         }
 
-        private void Start()
-        {
-            StartCoroutine(BuildAll());     
-        }
-
         #if UNITY_EDITOR
         public float DebugGenerateDelay = 0f;
         [ContextMenu("Generate")]
@@ -131,7 +129,7 @@ namespace TerrainEngine
         {
             ClearGeneratedMesh();
             voxelDataRef.DestroyAll();
-            i = 0; t = UnityEditor.EditorApplication.timeSinceStartup;
+            v = 0; t = UnityEditor.EditorApplication.timeSinceStartup;
             UnityEditor.EditorApplication.update += EditorUpdate;
         }
 
@@ -142,17 +140,46 @@ namespace TerrainEngine
             voxelDataRef.DestroyAll();
         }
 
-        int i;
-        double t;
+        
         private void EditorUpdate()
         {
-            if(i < voxelDataRef.layers.Count)
+            if(v < voxelDataRef.layers.Count)
             {
                 if(UnityEditor.EditorApplication.timeSinceStartup - t >= DebugGenerateDelay)
                 {
                     t += DebugGenerateDelay;
-                    BuildLayer(voxelDataRef.layers[i], i);
-                    i++;
+
+                    for (int i = 0; i < voxelDataRef.layers.Count; i++)
+                    {
+                        if (voxelDataRef.layers.Count > 1)
+                        {
+                            if (i == 0)
+                            {
+                                BuildLayer(voxelDataRef.layers[0], 0, null, voxelDataRef.layers[1]);
+                                v++;
+                            }
+                            else if (i + 1 < voxelDataRef.layers.Count)
+                            {
+                                BuildLayer(voxelDataRef.layers[i], i, voxelDataRef.layers[i - 1], voxelDataRef.layers[i + 1]);
+                                v++;
+                            }
+                            else if (i == voxelDataRef.layers.Count - 1)
+                            {
+                                BuildLayer(voxelDataRef.layers[i], i, voxelDataRef.layers[i - 1], null);
+                                v++;
+                            }
+
+
+                        }
+                        else if (voxelDataRef.layers.Count == 1)
+                        {
+                            BuildLayer(voxelDataRef.layers[i], i);
+                            v++;
+                        }
+                        i++;
+                        
+                    }
+                    
                 }
             }
             else
