@@ -33,7 +33,6 @@ namespace TerrainEngine
         {
             for (int i = 0; i < voxelDataRef.layers.Count; i++)
             {
-                Debug.Log(i);
                 if (voxelDataRef.layers.Count > 1)
                 {
                     if(i == 0)
@@ -95,6 +94,7 @@ namespace TerrainEngine
             int gridX = source.width;
             int gridY = source.height;
 
+
             for (int x = 0; x < gridX; x++)
             {
                 for (int y = 0; y < gridY; y++)
@@ -102,11 +102,9 @@ namespace TerrainEngine
                     Voxel currentCell = voxelDataRef.GetVoxel(source.GetPixel(x, y));
                     if (currentCell != null)
                     {
-                        currentCell = Instantiate(currentCell);
-                        currentCell.gameObject.name = "x"+ x.ToString()+ "y" + y.ToString();
+                        currentCell = Instantiate(currentCell, transform);
                         currentCell._meshPerAngle = neighborhoodRef.WallsToBeKept(source, downstairs, upstairs, currentCell, x, y);
                         currentCell.transform.position = new Vector3(x, height, y);
-                        currentCell.transform.parent = transform;
                     }                    
                 }
             }
@@ -177,11 +175,12 @@ namespace TerrainEngine
                         BuildLayer(voxelDataRef.layers[v], v);
                     }
                     v++;
-                    
+
                 }
             }
             else
             {
+                UpdateMeshCollider();
                 gameObject.SetActive(true);
                 voxelDataRef.DestroyAll();
                 UnityEditor.EditorApplication.update -= EditorUpdate;
