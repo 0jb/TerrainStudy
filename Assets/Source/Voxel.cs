@@ -35,7 +35,6 @@ public class Voxel : MonoBehaviour
     public List<MeshPerAngle> _meshPerAngle;
 
     public bool PopulateNow;
-    public bool DebugAngle;
     public int Angle;
 
     private void FillVoxelMeshAngleList()
@@ -51,6 +50,7 @@ public class Voxel : MonoBehaviour
 
     private int QuaternionToInt(Quaternion QuaternionRef)
     {
+        //TODO: APPROXIMATION
         for (int i = 0; i < _QuaternionIntRef.Count; i++)
         {
             if (Quaternion.Angle(QuaternionRef, _QuaternionIntRef[i]) < 0.1f &&
@@ -68,7 +68,7 @@ public class Voxel : MonoBehaviour
         {
             if (TargetAngle == _meshPerAngle[i].PivotAngle)
             {
-                //_meshPerAngle[i].CandidateForExclusion = true;
+                _meshPerAngle[i].CandidateForExclusion = true;
                 return true;
             }
         }
@@ -82,11 +82,6 @@ public class Voxel : MonoBehaviour
         {
             FillVoxelMeshAngleList();
             PopulateNow = false;
-        }
-
-        if (DebugAngle)
-        {
-            Debug.Log(DoIContainThisAngle(Angle) );
         }
     }
 }

@@ -32,15 +32,14 @@ namespace TerrainEngine
                 Voxel Neighbor;
                 switch (Home._meshPerAngle[i].PivotAngle)
                 {
-                        // CHECK TEXTURE BOUNDS
                     case 0:
                         if (Downstairs != null)
                         {
                             NeighborColor = Downstairs.GetPixel(XAdress, YAdress);
                             Neighbor = VoxelDataRef.GetVoxel(NeighborColor);
-                            if (!Neighbor.DoIContainThisAngle(1))
+                            if (Neighbor.type == Home.type)
                             {
-                                //KeepMyWalls.Remove(Home._meshPerAngle[i]);
+                                KeepMyWalls[i].CandidateForExclusion = true;
                             }
                         }                        
                         break;
@@ -49,9 +48,9 @@ namespace TerrainEngine
                         {
                             NeighborColor = Upstairs.GetPixel(XAdress, YAdress);
                             Neighbor = VoxelDataRef.GetVoxel(NeighborColor);
-                            if (!Neighbor.DoIContainThisAngle(0))
+                            if (Neighbor.type == Home.type)
                             {
-                                //KeepMyWalls[i].CandidateForExclusion = true;
+                                KeepMyWalls[i].CandidateForExclusion = true;
                             }
                         }                        
                         break;
@@ -60,10 +59,6 @@ namespace TerrainEngine
                         {
                             NeighborColor = HomeBlock.GetPixel(XAdress -1, YAdress);
                             Neighbor = VoxelDataRef.GetVoxel(NeighborColor);
-
-                            // TODO:
-                            // COUSIN: TYPES THAT HAVE RELATIONSHIP AND CAN SHARE SEAMS
-                            // COUSINS SHOULD BE DETECTED HERE AND INSTANTIATE A SEAM
                             if (Neighbor.type == Home.type)
                             {
                                 KeepMyWalls[i].CandidateForExclusion = true;
@@ -74,8 +69,7 @@ namespace TerrainEngine
                         if (YAdress - 1 >= 0)
                         {                            
                             NeighborColor = HomeBlock.GetPixel(XAdress, YAdress - 1);
-                            Neighbor = VoxelDataRef.GetVoxel(NeighborColor);
-                            
+                            Neighbor = VoxelDataRef.GetVoxel(NeighborColor);                            
                             if (Neighbor.type == Home.type)
                             {
                                 KeepMyWalls[i].CandidateForExclusion = true;
@@ -87,7 +81,6 @@ namespace TerrainEngine
                         {
                             NeighborColor = HomeBlock.GetPixel(XAdress + 1, YAdress);
                             Neighbor = VoxelDataRef.GetVoxel(NeighborColor);
-
                             if (Neighbor.type == Home.type)
                             {
                                KeepMyWalls[i].CandidateForExclusion = true;

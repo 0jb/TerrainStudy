@@ -26,7 +26,28 @@ namespace TerrainEngine
         {
             for (int i = 0; i < voxelDataRef.layers.Count; i++)
             {
-                BuildLayer(voxelDataRef.layers[i], i);
+                Debug.Log(i);
+                if (voxelDataRef.layers.Count > 1)
+                {
+                    if(i == 0)
+                    {
+                        BuildLayer(voxelDataRef.layers[0], 0, null, voxelDataRef.layers[1]);
+                    }
+                    else if (i + 1 < voxelDataRef.layers.Count)
+                    {
+                        BuildLayer(voxelDataRef.layers[i], i, voxelDataRef.layers[i - 1], voxelDataRef.layers[i + 1]);
+                    }
+                    else if (i == voxelDataRef.layers.Count - 1)
+                    {
+                        BuildLayer(voxelDataRef.layers[i], i, voxelDataRef.layers[i - 1], null);
+                    }                  
+
+                    
+                }
+                else if (voxelDataRef.layers.Count == 1)
+                {
+                    BuildLayer(voxelDataRef.layers[i], i);
+                }
                 yield return null;
             }
             
@@ -62,7 +83,7 @@ namespace TerrainEngine
             return allVoxelMeshFilters;
         }
 
-        private void BuildLayer(Texture2D source, float height)
+        private void BuildLayer(Texture2D source, float height, Texture2D downstairs = null, Texture2D upstairs = null)
         {
             int gridX = source.width;
             int gridY = source.height;
@@ -76,7 +97,7 @@ namespace TerrainEngine
                     {
                         currentCell = Instantiate(currentCell);
                         currentCell.gameObject.name = "x"+ x.ToString()+ "y" + y.ToString();
-                        currentCell._meshPerAngle = neighborhoodRef.WallsToBeKept(source, null, null, currentCell, x, y);
+                        currentCell._meshPerAngle = neighborhoodRef.WallsToBeKept(source, downstairs, upstairs, currentCell, x, y);
                         currentCell.transform.position = new Vector3(x, height, y);
                         currentCell.transform.parent = transform;
                     }                    
