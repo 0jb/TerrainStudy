@@ -28,15 +28,10 @@ namespace TerrainEngine
 
             for (int i = 0; i < Home._meshPerAngle.Count; i++)
             {
-                Debug.Log(i);
+                Color NeighborColor;
+                Voxel Neighbor;
                 switch (Home._meshPerAngle[i].PivotAngle)
                 {
-                    default:
-                        
-                        Color NeighborColor;
-                        Voxel Neighbor;
-                        break;
-
                         // CHECK TEXTURE BOUNDS
                     case 0:
                         if (Downstairs != null)
@@ -56,13 +51,12 @@ namespace TerrainEngine
                             Neighbor = VoxelDataRef.GetVoxel(NeighborColor);
                             if (!Neighbor.DoIContainThisAngle(0))
                             {
-                                //KeepMyWalls.Remove(Home._meshPerAngle[1]); 
-                                KeepMyWalls[i].CandidateForExclusion = true;
+                                //KeepMyWalls[i].CandidateForExclusion = true;
                             }
                         }                        
                         break;
                     case 2:
-                        if (XAdress - 1 > 0)
+                        if (XAdress - 1 >= 0)
                         {
                             NeighborColor = HomeBlock.GetPixel(XAdress -1, YAdress);
                             Neighbor = VoxelDataRef.GetVoxel(NeighborColor);
@@ -77,44 +71,37 @@ namespace TerrainEngine
                         }                        
                         break;
                     case 3:
-                        if (YAdress - 1 > 0)
+                        if (YAdress - 1 >= 0)
                         {                            
                             NeighborColor = HomeBlock.GetPixel(XAdress, YAdress - 1);
                             Neighbor = VoxelDataRef.GetVoxel(NeighborColor);
                             
                             if (Neighbor.type == Home.type)
                             {
-                                Debug.Log("Face 3");
-                                Debug.Log("source x" + XAdress + " y" + YAdress);
-                                Debug.Log("neighbor x" + XAdress + " y" + (YAdress - 1));
-
                                 KeepMyWalls[i].CandidateForExclusion = true;
-                            }
-                            else
-                            {
-                                Debug.Log("no neighbor");
                             }
                         }                        
                         break;
                     case 4:
-                        if (HomeBlock.height >= YAdress + 1)
+                        if (HomeBlock.width > XAdress + 1)
                         {
-                            NeighborColor = HomeBlock.GetPixel(XAdress, YAdress + 1);
+                            NeighborColor = HomeBlock.GetPixel(XAdress + 1, YAdress);
                             Neighbor = VoxelDataRef.GetVoxel(NeighborColor);
 
                             if (Neighbor.type == Home.type)
                             {
-                                //KeepMyWalls[i].CandidateForExclusion = true;
+                               KeepMyWalls[i].CandidateForExclusion = true;
                             }
                         }                        
                         break;
                     case 5:
-                        if (XAdress - 1 > 0)
+                        if (HomeBlock.height > YAdress + 1)
                         {
-                            NeighborColor = HomeBlock.GetPixel(XAdress - 1, YAdress);
+                            NeighborColor = HomeBlock.GetPixel(XAdress, YAdress + 1);
                             Neighbor = VoxelDataRef.GetVoxel(NeighborColor);
-                            if (!Neighbor.DoIContainThisAngle(3))
+                            if (Neighbor.type == Home.type)
                             {
+                                KeepMyWalls[i].CandidateForExclusion = true;
                             }
                         }                        
                         break;
@@ -128,6 +115,8 @@ namespace TerrainEngine
                 if (KeepMyWalls[i].CandidateForExclusion)
                 {
                     KeepMyWalls.RemoveAt(i);
+                    i--;
+                    listLength--;
                 }
             }
 

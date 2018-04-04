@@ -68,7 +68,7 @@ public class Voxel : MonoBehaviour
         {
             if (TargetAngle == _meshPerAngle[i].PivotAngle)
             {
-                _meshPerAngle[i].CandidateForExclusion = true;
+                //_meshPerAngle[i].CandidateForExclusion = true;
                 return true;
             }
         }
