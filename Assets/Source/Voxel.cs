@@ -14,22 +14,28 @@ public class Voxel : MonoBehaviour
     [System.Serializable]
     public class MeshPerAngle
     {
-        public Vector3 PivotAngle;
+        public int PivotAngle;
         public MeshFilter Mesh;
+        public bool CandidateForExclusion;
 
-        public MeshPerAngle(Vector3 _PivotAngle, MeshFilter _Mesh)
+        public MeshPerAngle(int _PivotAngle, MeshFilter _Mesh)
         {
             PivotAngle = _PivotAngle;
             Mesh = _Mesh;
         }
+        
     }
     
     [SerializeField]
+    private List<Quaternion> _QuaternionIntRef;
+    [SerializeField]
     private VoxelType _type;
+    public VoxelType type { get { return _type; } }
     [SerializeField]
     public List<MeshPerAngle> _meshPerAngle;
 
     public bool PopulateNow;
+    public int Angle;
 
     private void FillVoxelMeshAngleList()
     {
@@ -37,10 +43,39 @@ public class Voxel : MonoBehaviour
 
         for (int i = 0; i < transform.childCount; i++)
         {
-            _meshPerAngle.Add(new MeshPerAngle(transform.GetChild(i).transform.localEulerAngles, transform.GetChild(i).GetComponent<MeshFilter>()));
+            _meshPerAngle.Add(new MeshPerAngle(QuaternionToInt(transform.GetChild(i).transform.rotation), 
+                                                transform.GetChild(i).GetComponent<MeshFilter>()));
         }
     }
 
+    private int QuaternionToInt(Quaternion QuaternionRef)
+    {
+        //TODO: APPROXIMATION
+        for (int i = 0; i < _QuaternionIntRef.Count; i++)
+        {
+            if (Quaternion.Angle(QuaternionRef, _QuaternionIntRef[i]) < 0.1f &&
+                Quaternion.Angle(QuaternionRef, _QuaternionIntRef[i]) > -0.1f)
+            {
+                return i;
+            }
+        }
+        return 666;
+    }
+
+    public bool DoIContainThisAngle (int TargetAngle)
+    {
+        for (int i = 0; i < _meshPerAngle.Count; i++)
+        {
+            if (TargetAngle == _meshPerAngle[i].PivotAngle)
+            {
+                _meshPerAngle[i].CandidateForExclusion = true;
+                return true;
+            }
+        }
+
+        return false;
+    }
+        
     private void Update()
     {
         if (PopulateNow)

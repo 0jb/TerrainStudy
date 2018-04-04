@@ -1,27 +1,59 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace TerrainEngine
 {
     [ExecuteInEditMode]
     [RequireComponent(typeof(VoxelData))]
     [RequireComponent(typeof(MeshFilter))]
+    [RequireComponent(typeof(Neighborhood))]
     public class Generator : MonoBehaviour
     {
 
         private VoxelData voxelDataRef;
+        private Neighborhood neighborhoodRef;
+        private int v;
+        private double t;
 
         private void OnEnable()
         {
             voxelDataRef = GetComponent<VoxelData>();
+            neighborhoodRef = GetComponent<Neighborhood>();
+            if (Application.isPlaying)
+            {
+                StartCoroutine(BuildAll());
+            }
         }
 
         private IEnumerator BuildAll()
         {
             for (int i = 0; i < voxelDataRef.layers.Count; i++)
             {
-                BuildLayer(voxelDataRef.layers[i], i);
+                if (voxelDataRef.layers.Count > 1)
+                {
+                    if(i == 0)
+                    {
+                        BuildLayer(voxelDataRef.layers[0], 0, null, voxelDataRef.layers[1]);
+                    }
+                    else if (i + 1 < voxelDataRef.layers.Count)
+                    {
+                        BuildLayer(voxelDataRef.layers[i], i, voxelDataRef.layers[i - 1], voxelDataRef.layers[i + 1]);
+                    }
+                    else if (i == voxelDataRef.layers.Count - 1)
+                    {
+                        BuildLayer(voxelDataRef.layers[i], i, voxelDataRef.layers[i - 1], null);
+                    }                  
+
+                    
+                }
+                else if (voxelDataRef.layers.Count == 1)
+                {
+                    BuildLayer(voxelDataRef.layers[i], i);
+                }
                 yield return null;
             }
             
@@ -57,21 +89,22 @@ namespace TerrainEngine
             return allVoxelMeshFilters;
         }
 
-        private void BuildLayer(Texture2D source, float height)
+        private void BuildLayer(Texture2D source, float height, Texture2D downstairs = null, Texture2D upstairs = null)
         {
             int gridX = source.width;
             int gridY = source.height;
+
 
             for (int x = 0; x < gridX; x++)
             {
                 for (int y = 0; y < gridY; y++)
                 {
                     Voxel currentCell = voxelDataRef.GetVoxel(source.GetPixel(x, y));
-                    if(currentCell != null)
+                    if (currentCell != null)
                     {
-                        currentCell = Instantiate(currentCell);
+                        currentCell = Instantiate(currentCell, transform);
+                        currentCell._meshPerAngle = neighborhoodRef.WallsToBeKept(source, downstairs, upstairs, currentCell, x, y);
                         currentCell.transform.position = new Vector3(x, height, y);
-                        currentCell.transform.parent = transform;
                     }                    
                 }
             }
@@ -93,11 +126,6 @@ namespace TerrainEngine
             }
         }
 
-        private void Start()
-        {
-            StartCoroutine(BuildAll());     
-        }
-
         #if UNITY_EDITOR
         public float DebugGenerateDelay = 0f;
         [ContextMenu("Generate")]
@@ -105,7 +133,7 @@ namespace TerrainEngine
         {
             ClearGeneratedMesh();
             voxelDataRef.DestroyAll();
-            i = 0; t = UnityEditor.EditorApplication.timeSinceStartup;
+            v = 0; t = UnityEditor.EditorApplication.timeSinceStartup;
             UnityEditor.EditorApplication.update += EditorUpdate;
         }
 
@@ -116,21 +144,43 @@ namespace TerrainEngine
             voxelDataRef.DestroyAll();
         }
 
-        int i;
-        double t;
+        
         private void EditorUpdate()
         {
-            if(i < voxelDataRef.layers.Count)
+            if(v < voxelDataRef.layers.Count)
             {
                 if(UnityEditor.EditorApplication.timeSinceStartup - t >= DebugGenerateDelay)
                 {
                     t += DebugGenerateDelay;
-                    BuildLayer(voxelDataRef.layers[i], i);
-                    i++;
+                    //BuildLayer(voxelDataRef.layers[v], v);
+                    if (voxelDataRef.layers.Count > 1)
+                    {
+                        if (v == 0)
+                        {
+                            BuildLayer(voxelDataRef.layers[0], 0, null, voxelDataRef.layers[1]);
+                        }
+                        else if (v + 1 < voxelDataRef.layers.Count)
+                        {
+                            BuildLayer(voxelDataRef.layers[v], v, voxelDataRef.layers[v - 1], voxelDataRef.layers[v + 1]);
+                        }
+                        else if (v == voxelDataRef.layers.Count - 1)
+                        {
+                            BuildLayer(voxelDataRef.layers[v], v, voxelDataRef.layers[v - 1], null);
+                        }
+
+
+                    }
+                    else if (voxelDataRef.layers.Count == 1)
+                    {
+                        BuildLayer(voxelDataRef.layers[v], v);
+                    }
+                    v++;
+
                 }
             }
             else
             {
+                UpdateMeshCollider();
                 gameObject.SetActive(true);
                 voxelDataRef.DestroyAll();
                 UnityEditor.EditorApplication.update -= EditorUpdate;

@@ -59,7 +59,7 @@ namespace TerrainEngine
             }
         }
 
-        public Voxel GetVoxel(Color Selector)
+        public Voxel GetVoxel (Color Selector)
         {
             for (int i = 0; i < _voxel.Count; i++)
             {
