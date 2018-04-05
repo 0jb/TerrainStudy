@@ -1,7 +1,7 @@
 fileFormatVersion: 2
 guid: 070e9988ffc98d14b85727e71cdc258e
-timeCreated: 1522924260
-licenseType: Free
+timeCreated: 1522946735
+licenseType: Pro
 SubstanceImporter:
   serializedVersion: 5
   materialInstances:
@@ -16,14 +16,14 @@ SubstanceImporter:
     inputs:
     - name: terrain_height
       value:
-        scalar[0]: 0.243
+        scalar[0]: 0
         scalar[1]: 0
         scalar[2]: 0
         scalar[3]: 0
         texture: {instanceID: 0}
     - name: $randomseed
       value:
-        scalar[0]: 0
+        scalar[0]: 9599
         scalar[1]: 0
         scalar[2]: 0
         scalar[3]: 0
@@ -109,7 +109,7 @@ SubstanceImporter:
       buildTarget: 
       textureWidth: 512
       textureHeight: 512
-      textureFormat: 0
+      textureFormat: 1
       loadingBehavior: 1
   deletedPrototypes: []
   userData: 

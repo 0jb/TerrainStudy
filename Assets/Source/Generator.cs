@@ -13,9 +13,9 @@ namespace TerrainEngine
     [RequireComponent(typeof(Neighborhood))]
     public class Generator : MonoBehaviour
     {
-
         private VoxelData voxelDataRef;
         private Neighborhood neighborhoodRef;
+        private LayerMapGenerator layerMapGeneratorRef;
         private int v;
         private double t;
 
@@ -88,7 +88,7 @@ namespace TerrainEngine
 
             return allVoxelMeshFilters;
         }
-
+        
         private void BuildLayer(Texture2D source, float height, Texture2D downstairs = null, Texture2D upstairs = null)
         {
             int gridX = source.width;
@@ -96,7 +96,7 @@ namespace TerrainEngine
 
 
             for (int x = 0; x < gridX; x++)
-            {
+            {                
                 for (int y = 0; y < gridY; y++)
                 {
                     Voxel currentCell = voxelDataRef.GetVoxel(source.GetPixel(x, y));
@@ -127,7 +127,8 @@ namespace TerrainEngine
         }
 
         #if UNITY_EDITOR
-        public float DebugGenerateDelay = 0f;
+        [SerializeField]
+        private float DebugGenerateDelay = 0f;
         [ContextMenu("Generate")]
         private void ContextGenerate()
         {
@@ -152,7 +153,6 @@ namespace TerrainEngine
                 if(UnityEditor.EditorApplication.timeSinceStartup - t >= DebugGenerateDelay)
                 {
                     t += DebugGenerateDelay;
-                    //BuildLayer(voxelDataRef.layers[v], v);
                     if (voxelDataRef.layers.Count > 1)
                     {
                         if (v == 0)
