@@ -94,11 +94,12 @@ namespace TerrainEngine
 
         public Voxel GetVoxel (Color Selector)
         {
+
+            Debug.Log(Selector);
             for (int i = 0; i < _voxel.Count; i++)
             {
                 if (_voxel[i].GetVoxelByColor(Selector))
                 {
-                    Debug.Log(Selector);
 
                     if (_voxel[i].Target == null)
                     {
@@ -107,10 +108,9 @@ namespace TerrainEngine
 
                     return _voxel[i].Target;
                 }
+                //return _voxel[i].GetVoxelByColor(new Color(0.0f, 0.0f, 0.0f));
             }
-
             Debug.LogErrorFormat("GetVoxel(): No voxel found for color = {0}", Selector);
-
             return null;
         }
 

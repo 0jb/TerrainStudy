@@ -1,7 +1,7 @@
 fileFormatVersion: 2
 guid: 070e9988ffc98d14b85727e71cdc258e
-timeCreated: 1522946735
-licenseType: Pro
+timeCreated: 1522970493
+licenseType: Free
 SubstanceImporter:
   serializedVersion: 5
   materialInstances:
@@ -16,7 +16,7 @@ SubstanceImporter:
     inputs:
     - name: terrain_height
       value:
-        scalar[0]: 0
+        scalar[0]: 0.8
         scalar[1]: 0
         scalar[2]: 0
         scalar[3]: 0
