@@ -11,3 +11,4 @@ TODO:
 
 * Make it work with Substance Designer.
 * We must be able to create seams between different types, so when Generator finds a type that has a valid seam already assigned, it uses it to fill the gap between multiple voxel types.
+* Detect the limit of 64k vertices and combine on multiple meshes since Unity doesn't allows us to have meshes with more than 64k vertices. Maybe this info can be baked into each voxel so generator can handle this without much cost.
