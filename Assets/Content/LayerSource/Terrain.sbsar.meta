@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: 070e9988ffc98d14b85727e71cdc258e
-timeCreated: 1522971267
+timeCreated: 1523011442
 licenseType: Free
 SubstanceImporter:
   serializedVersion: 5
@@ -25,6 +25,13 @@ SubstanceImporter:
       value:
         scalar[0]: 9599
         scalar[1]: 0
+        scalar[2]: 0
+        scalar[3]: 0
+        texture: {instanceID: 0}
+    - name: offset
+      value:
+        scalar[0]: -0.061
+        scalar[1]: -0.122
         scalar[2]: 0
         scalar[3]: 0
         texture: {instanceID: 0}
