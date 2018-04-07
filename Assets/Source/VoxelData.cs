@@ -25,8 +25,6 @@ namespace TerrainEngine
         
         [SerializeField]
         private int _height;
-        [SerializeField]
-        private bool _generateProcedural;
 
         private LayerMapGenerator LayerMapGeneratorRef;
 
@@ -70,10 +68,13 @@ namespace TerrainEngine
             _buffer.Clear();
         }
         
-        private void FeedTextureBuffer()
+        public void FeedTextureBuffer()
         {
             _layers.Clear();
+            //UnityEditor.EditorApplication.update -= FeedTextureBuffer;
             StartCoroutine(LayerMapGeneratorRef.GetProceduralLayer(_height));
+
+            
 
             //for (int a = 0; a < _height; a++)
             //{
@@ -114,14 +115,7 @@ namespace TerrainEngine
             return null;
         }
 
-        private void Update()
-        {
-            if (_generateProcedural)
-            {
-                FeedTextureBuffer();
-                _generateProcedural = false;
-            }
-        }
+        
 
     }
 }

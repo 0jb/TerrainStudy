@@ -35,7 +35,7 @@ namespace TerrainEngine
             {
                 if (voxelDataRef.layers.Count > 1)
                 {
-                    if(i == 0)
+                    if (i == 0)
                     {
                         BuildLayer(voxelDataRef.layers[0], 0, null, voxelDataRef.layers[1]);
                     }
@@ -46,9 +46,9 @@ namespace TerrainEngine
                     else if (i == voxelDataRef.layers.Count - 1)
                     {
                         BuildLayer(voxelDataRef.layers[i], i, voxelDataRef.layers[i - 1], null);
-                    }                  
+                    }
 
-                    
+
                 }
                 else if (voxelDataRef.layers.Count == 1)
                 {
@@ -56,7 +56,7 @@ namespace TerrainEngine
                 }
                 yield return null;
             }
-            
+
             gameObject.SetActive(true);
             voxelDataRef.DestroyAll();
             UpdateMeshCollider();
@@ -67,7 +67,7 @@ namespace TerrainEngine
             CombineInstance[] combine = new CombineInstance[Origin.Count];
             combine[0].mesh = GetComponent<MeshFilter>().sharedMesh;
             combine[0].transform = transform.localToWorldMatrix;
-            for (int i = 0; i  < Origin.Count; i++)
+            for (int i = 0; i < Origin.Count; i++)
             {
                 combine[i].mesh = Origin[i].Mesh.sharedMesh;
                 combine[i].transform = Origin[i].Mesh.transform.localToWorldMatrix;
@@ -88,7 +88,7 @@ namespace TerrainEngine
 
             return allVoxelMeshFilters;
         }
-        
+
         private void BuildLayer(Texture2D source, float height, Texture2D downstairs = null, Texture2D upstairs = null)
         {
             int gridX = source.width;
@@ -96,7 +96,7 @@ namespace TerrainEngine
 
 
             for (int x = 0; x < gridX; x++)
-            {                
+            {
                 for (int y = 0; y < gridY; y++)
                 {
                     Voxel currentCell = voxelDataRef.GetVoxel(source.GetPixel(x, y));
@@ -105,13 +105,13 @@ namespace TerrainEngine
                         currentCell = Instantiate(currentCell, transform);
                         currentCell._meshPerAngle = neighborhoodRef.WallsToBeKept(source, downstairs, upstairs, currentCell, x, y);
                         currentCell.transform.position = new Vector3(x, height, y);
-                    }                    
+                    }
                 }
             }
             CombineAll(GetVoxelMeshFilters());
-            
+
         }
-        
+
         private void ClearGeneratedMesh()
         {
             transform.GetComponent<MeshFilter>().sharedMesh = new Mesh();
@@ -120,72 +120,87 @@ namespace TerrainEngine
 
         private void UpdateMeshCollider()
         {
-            if(GetComponent<MeshCollider>() != null)
+            if (GetComponent<MeshCollider>() != null)
             {
                 GetComponent<MeshCollider>().sharedMesh = GetComponent<MeshFilter>().sharedMesh;
             }
         }
 
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         [SerializeField]
         private float DebugGenerateDelay = 0f;
-        [ContextMenu("Generate")]
-        private void ContextGenerate()
+
+        public void ContextGenerate()
         {
+
             ClearGeneratedMesh();
             voxelDataRef.DestroyAll();
             v = 0; t = UnityEditor.EditorApplication.timeSinceStartup;
             UnityEditor.EditorApplication.update += EditorUpdate;
+
+
+
         }
 
-        [ContextMenu("Clear")]
-        private void ContextClear()
+
+        public void ContextClear()
         {
             ClearGeneratedMesh();
             voxelDataRef.DestroyAll();
         }
 
-        
+
         private void EditorUpdate()
         {
-            if(v < voxelDataRef.layers.Count)
+            try
             {
-                if(UnityEditor.EditorApplication.timeSinceStartup - t >= DebugGenerateDelay)
+
+                if (v < voxelDataRef.layers.Count)
                 {
-                    t += DebugGenerateDelay;
-                    if (voxelDataRef.layers.Count > 1)
+                    if (UnityEditor.EditorApplication.timeSinceStartup - t >= DebugGenerateDelay)
                     {
-                        if (v == 0)
+                        t += DebugGenerateDelay;
+                        if (voxelDataRef.layers.Count > 1)
                         {
-                            BuildLayer(voxelDataRef.layers[0], 0, null, voxelDataRef.layers[1]);
-                        }
-                        else if (v + 1 < voxelDataRef.layers.Count)
-                        {
-                            BuildLayer(voxelDataRef.layers[v], v, voxelDataRef.layers[v - 1], voxelDataRef.layers[v + 1]);
-                        }
-                        else if (v == voxelDataRef.layers.Count - 1)
-                        {
-                            BuildLayer(voxelDataRef.layers[v], v, voxelDataRef.layers[v - 1], null);
-                        }
+                            if (v == 0)
+                            {
+                                BuildLayer(voxelDataRef.layers[0], 0, null, voxelDataRef.layers[1]);
+                            }
+                            else if (v + 1 < voxelDataRef.layers.Count)
+                            {
+                                BuildLayer(voxelDataRef.layers[v], v, voxelDataRef.layers[v - 1], voxelDataRef.layers[v + 1]);
+                            }
+                            else if (v == voxelDataRef.layers.Count - 1)
+                            {
+                                BuildLayer(voxelDataRef.layers[v], v, voxelDataRef.layers[v - 1], null);
+                            }
 
+
+                        }
+                        else if (voxelDataRef.layers.Count == 1)
+                        {
+                            BuildLayer(voxelDataRef.layers[v], v);
+                        }
+                        v++;
 
                     }
-                    else if (voxelDataRef.layers.Count == 1)
-                    {
-                        BuildLayer(voxelDataRef.layers[v], v);
-                    }
-                    v++;
-
                 }
+                else
+                {
+                    UpdateMeshCollider();
+                    gameObject.SetActive(true);
+                    voxelDataRef.DestroyAll();
+                    UnityEditor.EditorApplication.update -= EditorUpdate;
+                }
+
             }
-            else
+
+            catch
             {
-                UpdateMeshCollider();
-                gameObject.SetActive(true);
-                voxelDataRef.DestroyAll();
                 UnityEditor.EditorApplication.update -= EditorUpdate;
+                Debug.LogError("There's an error with the Generator. Perhaps the colors in the texture are different or there's no voxel linked to a color?");
             }
         }
-        #endif
+#endif
     }
 }
