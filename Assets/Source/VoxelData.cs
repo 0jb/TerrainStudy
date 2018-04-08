@@ -23,8 +23,7 @@ namespace TerrainEngine
         private List<ColorMappedVoxel> _voxel = new List<ColorMappedVoxel>();
         public List<ColorMappedVoxel> voxel { get { return _voxel; } }
         
-        [SerializeField]
-        private int _height;
+        public int _height;
 
         private LayerMapGenerator LayerMapGeneratorRef;
 

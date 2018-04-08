@@ -26,32 +26,40 @@ namespace TerrainEngine
             VoxelDataRef = GetComponent<VoxelData>();
         }
 
+        public void GenerateProceduralTexture(int i, float TotalHeight)
+        {
+            //Gets input and begins RebuildTextures function for next frame
+                float res = (float)i / (float)TotalHeight;
+                _substanceMaterial.isReadable = true;
+                _substanceMaterial.SetProceduralFloat(_parameterName, res);
+                _substanceMaterial.RebuildTextures();
+        }
 
+        public void GenerateTexture2D()
+        {
+            //Procedural Texture is created and is transformed into a Tex2D;
+                ProceduralTexture substanceTexture = _substanceMaterial.GetGeneratedTexture(_textureName);
+                Texture2D newTex = new Texture2D(substanceTexture.width, substanceTexture.height);
+                newTex.SetPixels32(substanceTexture.GetPixels32(0, 0, substanceTexture.width, substanceTexture.height));
+                newTex.Apply();
+                VoxelDataRef.layers.Add(newTex);
+        }
         public IEnumerator GetProceduralLayer(float TotalHeight)
         {
-            
+
             for (int i = 0; i < TotalHeight; i++)
             {
-                if (UnityEditor.EditorApplication.timeSinceStartup - t >= DebugGenerateDelay)
+                GenerateProceduralTexture(i, TotalHeight);
+                yield return null;
+                GenerateTexture2D();
+                
 
-                {
-                    float res = (float)i / (float)TotalHeight;
-                    _substanceMaterial.isReadable = true;
-                    _substanceMaterial.SetProceduralFloat(_parameterName, res);
-                    _substanceMaterial.RebuildTextures();
-                    yield return null;
-                    ProceduralTexture substanceTexture = _substanceMaterial.GetGeneratedTexture(_textureName);
-                    Texture2D newTex = new Texture2D(substanceTexture.width, substanceTexture.height);
-                    newTex.SetPixels32(substanceTexture.GetPixels32(0, 0, substanceTexture.width, substanceTexture.height));
-                    newTex.Apply();
-                    VoxelDataRef.layers.Add(newTex);
-                }
 
-                t += DebugGenerateDelay;
             }
-
-
             UnityEditor.EditorApplication.update -= VoxelDataRef.FeedTextureBuffer;
+
+
+            Debug.Log("Total Layers " + VoxelDataRef.layers.Count);
         }
 
     }
