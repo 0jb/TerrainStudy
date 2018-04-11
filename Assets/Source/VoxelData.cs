@@ -25,7 +25,10 @@ namespace TerrainEngine
         
         public int _height;
 
-        private LayerMapGenerator LayerMapGeneratorRef;
+        [SerializeField]
+        private bool _generateProcedural;
+
+        public LayerMapGenerator LayerMapGeneratorRef;
 
         private List<GameObject> _buffer = new List<GameObject>();
 
@@ -114,7 +117,14 @@ namespace TerrainEngine
             return null;
         }
 
-        
+        private void Update()
+        {
+            if (_generateProcedural)
+            {
+                FeedTextureBuffer();
+                _generateProcedural = false;
+            }
+        }
 
     }
 }

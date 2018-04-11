@@ -16,8 +16,6 @@ namespace TerrainEngine
 
         private VoxelData VoxelDataRef;
 
-        [SerializeField]
-        private float DebugGenerateDelay = 0f;
 
         private double t;
 
@@ -29,7 +27,7 @@ namespace TerrainEngine
         public void GenerateProceduralTexture(int i, float TotalHeight)
         {
             //Gets input and begins RebuildTextures function for next frame
-                float res = (float)i / (float)TotalHeight;
+                float res = (float)i / (float)TotalHeight; 
                 _substanceMaterial.isReadable = true;
                 _substanceMaterial.SetProceduralFloat(_parameterName, res);
                 _substanceMaterial.RebuildTextures();
@@ -52,14 +50,11 @@ namespace TerrainEngine
                 GenerateProceduralTexture(i, TotalHeight);
                 yield return null;
                 GenerateTexture2D();
-                
-
-
             }
-            UnityEditor.EditorApplication.update -= VoxelDataRef.FeedTextureBuffer;
+            //UnityEditor.EditorApplication.update -= VoxelDataRef.FeedTextureBuffer;
 
 
-            Debug.Log("Total Layers " + VoxelDataRef.layers.Count);
+            
         }
 
     }
