@@ -41,6 +41,7 @@ namespace TerrainEngine
                 newTex.SetPixels32(substanceTexture.GetPixels32(0, 0, substanceTexture.width, substanceTexture.height));
                 newTex.Apply();
                 VoxelDataRef.layers.Add(newTex);
+                
         }
         public IEnumerator GetProceduralLayer(float TotalHeight)
         {
@@ -50,6 +51,7 @@ namespace TerrainEngine
                 GenerateProceduralTexture(i, TotalHeight);
                 yield return null;
                 GenerateTexture2D();
+                
             }
             //UnityEditor.EditorApplication.update -= VoxelDataRef.FeedTextureBuffer;
 
